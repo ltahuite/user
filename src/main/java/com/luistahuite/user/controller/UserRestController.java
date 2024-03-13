@@ -1,7 +1,5 @@
 package com.luistahuite.user.controller;
 
-//import com.luistahuite.user.common.UserRequestMapper;
-//import com.luistahuite.user.common.UserResponseMapper;
 import com.luistahuite.user.common.UserRequestMapper;
 import com.luistahuite.user.common.UserResponseMapper;
 import com.luistahuite.user.dto.UserRequest;
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -65,7 +64,7 @@ public class UserRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) {
+    public ResponseEntity<UserResponse> update(@PathVariable UUID id, @RequestBody UserRequest userRequest) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User updateUser = optionalUser.get();
