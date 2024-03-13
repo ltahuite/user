@@ -2,6 +2,8 @@ package com.luistahuite.user.controller;
 
 //import com.luistahuite.user.common.UserRequestMapper;
 //import com.luistahuite.user.common.UserResponseMapper;
+import com.luistahuite.user.common.UserRequestMapper;
+import com.luistahuite.user.common.UserResponseMapper;
 import com.luistahuite.user.dto.UserRequest;
 import com.luistahuite.user.dto.UserResponse;
 import com.luistahuite.user.entities.User;
@@ -31,45 +33,49 @@ import java.util.Optional;
 public class UserRestController {
     private final UserService userService;
     private final UserRepository userRepository;
+    private final UserResponseMapper userResponseMapper;
+    private final UserRequestMapper userRequestMapper;
 
 
     @Autowired
-    public UserRestController(UserService userService, UserRepository userRepository) {
+    public UserRestController(UserService userService, UserRepository userRepository, UserResponseMapper userResponseMapper, UserRequestMapper userRequestMapper) {
         this.userService = userService;
         this.userRepository = userRepository;
+        this.userResponseMapper = userResponseMapper;
+        this.userRequestMapper = userRequestMapper;
     }
 
-//    @GetMapping()
-//    public ResponseEntity<List<UserResponse>> findAll() {
-//        List<User> users = userService.findAll();
-//        if (null == users || users.isEmpty()) {
-//            return ResponseEntity.noContent().build();
-//        } else {
-//            return ResponseEntity.ok(userResponseMapper.UserListToUserResponseList(users));
-//        }
-//    }
+    @GetMapping()
+    public ResponseEntity<List<UserResponse>> findAll() {
+        List<User> users = userService.findAll();
+        if (null == users || users.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(userResponseMapper.UserListToUserResponseList(users));
+        }
+    }
 
     @Operation(description = "User creator.", summary = "return 201 in success case.")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Exito."),
             @ApiResponse(responseCode = "500", description = "Internal error.")})
     @PostMapping()
-    public ResponseEntity<User> create(@RequestBody User user) {
-        User save = userService.save(user);
-        return new ResponseEntity<>(save, HttpStatus.CREATED);
+    public ResponseEntity<UserResponse> create(@RequestBody UserRequest userRequest) {
+        User save = userService.save(userRequestMapper.UserRequestToUser(userRequest));
+        return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.CREATED);
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) {
-//        Optional<User> optionalUser = userRepository.findById(id);
-//        if (optionalUser.isPresent()) {
-//            User updateUser = optionalUser.get();
-//            updateUser.setName(userRequest.getName());
-//            updateUser.setEmail(userRequest.getEmail());
-//            updateUser.setPassword(userRequest.getPassword());
-//            User save = userRepository.save(updateUser);
-//            return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            User updateUser = optionalUser.get();
+            updateUser.setName(userRequest.getName());
+            updateUser.setEmail(userRequest.getEmail());
+            updateUser.setPassword(userRequest.getPassword());
+            User save = userRepository.save(updateUser);
+            return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
