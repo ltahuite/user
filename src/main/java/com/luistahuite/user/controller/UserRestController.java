@@ -1,7 +1,16 @@
 package com.luistahuite.user.controller;
 
+//import com.luistahuite.user.common.UserRequestMapper;
+//import com.luistahuite.user.common.UserResponseMapper;
+import com.luistahuite.user.dto.UserRequest;
+import com.luistahuite.user.dto.UserResponse;
 import com.luistahuite.user.entities.User;
 import com.luistahuite.user.repository.UserRepository;
+import com.luistahuite.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,34 +27,49 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
+@Tag(name = "REST User API", description = "This API serve all functionality for manager users.")
 public class UserRestController {
-    @Autowired
-    UserRepository userRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
-    @GetMapping()
-    public List<User> findAll() {
-        return userRepository.findAll();
+
+    @Autowired
+    public UserRestController(UserService userService, UserRepository userRepository) {
+        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
+//    @GetMapping()
+//    public ResponseEntity<List<UserResponse>> findAll() {
+//        List<User> users = userService.findAll();
+//        if (null == users || users.isEmpty()) {
+//            return ResponseEntity.noContent().build();
+//        } else {
+//            return ResponseEntity.ok(userResponseMapper.UserListToUserResponseList(users));
+//        }
+//    }
+
+    @Operation(description = "User creator.", summary = "return 201 in success case.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Exito."),
+            @ApiResponse(responseCode = "500", description = "Internal error.")})
     @PostMapping()
     public ResponseEntity<User> create(@RequestBody User user) {
-        User save = userRepository.save(user);
-        return ResponseEntity.ok(save);
+        User save = userService.save(user);
+        return new ResponseEntity<>(save, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable long id, @RequestBody User user) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            User updateUser = optionalUser.get();
-            updateUser.setName(user.getName());
-            updateUser.setEmail(user.getEmail());
-            updateUser.setPassword(user.getPassword());
-            User save = userRepository.save(updateUser);
-            return new ResponseEntity<>(save, HttpStatus.OK);
-
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) {
+//        Optional<User> optionalUser = userRepository.findById(id);
+//        if (optionalUser.isPresent()) {
+//            User updateUser = optionalUser.get();
+//            updateUser.setName(userRequest.getName());
+//            updateUser.setEmail(userRequest.getEmail());
+//            updateUser.setPassword(userRequest.getPassword());
+//            User save = userRepository.save(updateUser);
+//            return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
 }
