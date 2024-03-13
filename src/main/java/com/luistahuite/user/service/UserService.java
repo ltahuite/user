@@ -4,10 +4,9 @@ import com.luistahuite.user.common.UserRequestMapper;
 import com.luistahuite.user.dto.PhoneRequest;
 import com.luistahuite.user.dto.UserRequest;
 import com.luistahuite.user.entities.Phone;
+import com.luistahuite.user.entities.Regex;
 import com.luistahuite.user.entities.User;
-import com.luistahuite.user.repository.PhoneRepository;
 import com.luistahuite.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +21,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserRequestMapper userRequestMapper;
     private final PhoneService phoneService;
+    private final RegexService regexService;
 
-    private static String regexEmail = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$";
-    private static String regexPassword = "";
+    private static final String regexEmail = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+    private static final String regexPassword = "\\p{javaLowerCase}+";
+    private static final String regexTypeEmail = "email";
+    private static final String regexTypePassword = "password";
 
 
     @Autowired
-    public UserService(UserRepository userRepository, UserRequestMapper userRequestMapper, PhoneService phoneService) {
+    public UserService(UserRepository userRepository, UserRequestMapper userRequestMapper, PhoneService phoneService, RegexService regexService) {
         this.userRepository = userRepository;
         this.userRequestMapper = userRequestMapper;
         this.phoneService = phoneService;
+        this.regexService = regexService;
     }
     public List<User> findAll() {
         return userRepository.findAll();
@@ -50,7 +53,6 @@ public class UserService {
             phone.setContrycode(p.getContrycode());
             phoneService.save(phone);
         }
-        List<Phone> phones = phoneService.findAll();
         return user;
 
     }
@@ -73,12 +75,22 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public Boolean validateRegex(String regex, String value) {
-        return Pattern.matches(regex, value);
+    public Boolean validateRegexEmail(String email) {
+        String regex = regexEmail;
+        Optional<Regex> optionalRegex = regexService.findByType(regexTypeEmail);
+        if (optionalRegex.isPresent()) {
+            regex = optionalRegex.get().getExpression();
+        }
+
+        return Pattern.matches(regex, email);
     }
 
-    public Boolean validateRegexEmail(String password) {
-        String regex = regexEmail;
+    public Boolean validateRegexPassword(String password) {
+        String regex = regexPassword;
+        Optional<Regex> optionalRegex = regexService.findByType(regexTypePassword);
+        if (optionalRegex.isPresent()) {
+            regex = optionalRegex.get().getExpression();
+        }
 
         return Pattern.matches(regex, password);
     }

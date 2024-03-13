@@ -1,12 +1,14 @@
 package com.luistahuite.user.controller;
 
+import com.luistahuite.user.common.RegexRequestMapper;
+import com.luistahuite.user.dto.RegexRequest;
+import com.luistahuite.user.entities.Regex;
 import com.luistahuite.user.exception.RuleException;
-import com.luistahuite.user.common.UserRequestMapper;
 import com.luistahuite.user.common.UserResponseMapper;
 import com.luistahuite.user.dto.UserRequest;
 import com.luistahuite.user.dto.UserResponse;
 import com.luistahuite.user.entities.User;
-import com.luistahuite.user.repository.UserRepository;
+import com.luistahuite.user.service.RegexService;
 import com.luistahuite.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,17 +34,18 @@ import java.util.UUID;
 @Tag(name = "REST User API", description = "This API serve all functionality for manager users.")
 public class UserRestController {
     private final UserService userService;
-    private final UserRepository userRepository;
     private final UserResponseMapper userResponseMapper;
-    private final UserRequestMapper userRequestMapper;
+    private final RegexService regexService;
+
+    private final RegexRequestMapper regexRequestMapper;
 
 
     @Autowired
-    public UserRestController(UserService userService, UserRepository userRepository, UserResponseMapper userResponseMapper, UserRequestMapper userRequestMapper) {
+    public UserRestController(UserService userService, UserResponseMapper userResponseMapper, RegexService regexService, RegexRequestMapper regexRequestMapper) {
         this.userService = userService;
-        this.userRepository = userRepository;
         this.userResponseMapper = userResponseMapper;
-        this.userRequestMapper = userRequestMapper;
+        this.regexService = regexService;
+        this.regexRequestMapper = regexRequestMapper;
     }
 
     @GetMapping()
@@ -63,7 +66,11 @@ public class UserRestController {
     public ResponseEntity<UserResponse> create(@RequestBody UserRequest userRequest) throws RuleException {
         Optional<User> validateEmail = userService.findByEmail(userRequest.getEmail());
         if (validateEmail.isPresent()) {
-            throw new RuleException("El email ingresado ya se encuentra registrado.", HttpStatus.PRECONDITION_FAILED);
+            throw new RuleException("El correo ya registrado.", HttpStatus.PRECONDITION_FAILED);
+        } else if (!userService.validateRegexEmail(userRequest.getEmail())) {
+            throw new RuleException("El correo ingresado no cumple con el formato requerido.", HttpStatus.PRECONDITION_FAILED);
+        } else if (!userService.validateRegexPassword(userRequest.getPassword())) {
+            throw new RuleException("El password ingresado no cumple con el formato requerido.", HttpStatus.PRECONDITION_FAILED);
         } else {
             User save = userService.save(userRequest);
             return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.CREATED);
@@ -74,5 +81,17 @@ public class UserRestController {
     public ResponseEntity<UserResponse> update(@PathVariable UUID id, @RequestBody UserRequest userRequest) {
         Optional<User> optionalUser = userService.update(id, userRequest);
         return optionalUser.map(user -> new ResponseEntity<>(userResponseMapper.UserToUserResponse(user), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @Operation(description = "Set Regular expression.", summary = "Type values: email, password.")
+    @PostMapping("/setregex")
+    public ResponseEntity<?> setRegex(RegexRequest regexRequest) {
+        Optional<Regex> optionalRegex = regexService.findByType(regexRequest.getType());
+        Regex regex = regexRequestMapper.RegexRequestToRegex(regexRequest);
+        optionalRegex.ifPresent(value -> regex.setId(value.getId()));
+
+        regexService.save(regex);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
