@@ -16,4 +16,11 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(RuleException.class)
+    public ResponseEntity<ApiExceptionResponse> handlerRuleException(RuleException ex) {
+
+        ApiExceptionResponse response = new ApiExceptionResponse(ex.getMensaje());
+        return new ResponseEntity<>(response,ex.getHttpStatus());
+    }
+
 }

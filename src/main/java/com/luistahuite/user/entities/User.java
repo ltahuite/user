@@ -1,18 +1,15 @@
 package com.luistahuite.user.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,12 +26,13 @@ public class User {
     @Schema(name = "email", required = true, example = "luis@example.com", defaultValue = "luis@example.com", description = "Correo del Usuario. Debe ser unico.")
     private String email;
     private String password;
+    @CreationTimestamp
     private Date created;
+    @CreationTimestamp
     private Date modified;
+    @CreationTimestamp
     private Date lastLogin;
     private String token;
     private Boolean isActive;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Phone> phones;
 
 }

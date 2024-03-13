@@ -1,15 +1,11 @@
 package com.luistahuite.user.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 import java.util.UUID;
@@ -29,8 +25,8 @@ public class Phone {
     private Integer citycode;
     @Schema(name = "contrycode", required = true, example = "502", defaultValue = "", description = "Código de ciudad del teléfono")
     private Integer contrycode;
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY,targetEntity = User.class)
-    @JoinColumn(name = "userId", nullable = true)
-    private User user;
+    @Column(columnDefinition = "CHAR(36)")
+    private UUID userId;
+
+
 }

@@ -1,5 +1,6 @@
 package com.luistahuite.user.controller;
 
+import com.luistahuite.user.exception.RuleException;
 import com.luistahuite.user.common.UserRequestMapper;
 import com.luistahuite.user.common.UserResponseMapper;
 import com.luistahuite.user.dto.UserRequest;
@@ -56,25 +57,22 @@ public class UserRestController {
 
     @Operation(description = "User creator.", summary = "return 201 in success case.")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Exito."),
-            @ApiResponse(responseCode = "500", description = "Internal error.")})
+            @ApiResponse(responseCode = "500", description = "Internal error."),
+            @ApiResponse(responseCode = "412", description = "Error validando datos.")})
     @PostMapping()
-    public ResponseEntity<UserResponse> create(@RequestBody UserRequest userRequest) {
-        User save = userService.save(userRequestMapper.UserRequestToUser(userRequest));
-        return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.CREATED);
+    public ResponseEntity<UserResponse> create(@RequestBody UserRequest userRequest) throws RuleException {
+        Optional<User> validateEmail = userService.findByEmail(userRequest.getEmail());
+        if (validateEmail.isPresent()) {
+            throw new RuleException("El email ingresado ya se encuentra registrado.", HttpStatus.PRECONDITION_FAILED);
+        } else {
+            User save = userService.save(userRequest);
+            return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.CREATED);
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable UUID id, @RequestBody UserRequest userRequest) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            User updateUser = optionalUser.get();
-            updateUser.setName(userRequest.getName());
-            updateUser.setEmail(userRequest.getEmail());
-            updateUser.setPassword(userRequest.getPassword());
-            User save = userRepository.save(updateUser);
-            return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Optional<User> optionalUser = userService.update(id, userRequest);
+        return optionalUser.map(user -> new ResponseEntity<>(userResponseMapper.UserToUserResponse(user), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

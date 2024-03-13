@@ -20,8 +20,8 @@ public class UserRequestMapper {
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
         user.setPassword(userRequest.getPassword());
-        List<Phone> phones = phoneRequestMapper.PhoneListRequestToPhoneList(userRequest.getPhones());
-        user.setPhones(phones);
+//        List<Phone> phones = phoneRequestMapper.PhoneListRequestToPhoneList(userRequest.getPhones());
+//        user.setPhones(phones);
         return user;
     }
     public List<User> UserRequestListToUserList(List<UserRequest> userRequest) {
