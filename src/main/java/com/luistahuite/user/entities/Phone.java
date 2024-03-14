@@ -17,13 +17,13 @@ public class Phone {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "CHAR(36)")
-    @Schema(name = "id", required = true, example = "979942b2-8697-48c8-b231-62f0722300ef", defaultValue = "", description = "Id de teléfono")
+    @Schema(name = "id", example = "979942b2-8697-48c8-b231-62f0722300ef", defaultValue = "", description = "Id de teléfono")
     private UUID id;
-    @Schema(name = "number", required = true, example = "1234567", defaultValue = "", description = "Número de teléfono")
+    @Schema(name = "number", example = "1234567", defaultValue = "", description = "Número de teléfono")
     private Integer number;
-    @Schema(name = "citycode", required = true, example = "1", defaultValue = "", description = "Código de área del teléfono")
+    @Schema(name = "citycode", example = "1", defaultValue = "", description = "Código de área del teléfono")
     private Integer citycode;
-    @Schema(name = "contrycode", required = true, example = "502", defaultValue = "", description = "Código de ciudad del teléfono")
+    @Schema(name = "contrycode", example = "502", defaultValue = "", description = "Código de ciudad del teléfono")
     private Integer contrycode;
     @Column(columnDefinition = "CHAR(36)")
     private UUID userId;

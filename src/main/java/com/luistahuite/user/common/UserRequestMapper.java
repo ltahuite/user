@@ -7,10 +7,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserRequestMapper {
-    @Autowired
-    PhoneRequestMapper phoneRequestMapper;
+    private final PhoneRequestMapper phoneRequestMapper;
 
-    public User UserRequestToUser(UserRequest userRequest) {
+    @Autowired
+    public UserRequestMapper(PhoneRequestMapper phoneRequestMapper) {
+        this.phoneRequestMapper = phoneRequestMapper;
+
+    }
+
+    public User userRequestToUser(UserRequest userRequest) {
         User user = new User();
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
