@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -71,7 +72,12 @@ public class UserService {
         Optional<User> optionalUser = findById(id);
         if (optionalUser.isPresent()) {
             User updateUser = optionalUser.get();
-            updateUser = userRequestMapper.UserRequestToUser(userRequest);
+            updateUser.setName(userRequest.getName());
+            updateUser.setEmail(userRequest.getEmail());
+            updateUser.setPassword(userRequest.getPassword());
+            updateUser.setId(optionalUser.get().getId());
+            Calendar cal = Calendar.getInstance();
+            updateUser.setModified(cal.getTime());
             userRepository.save(updateUser);
         }
         return optionalUser;
