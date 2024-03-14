@@ -11,11 +11,11 @@ import java.util.UUID;
 @Schema(name = "UserResponse", description = "Model represents a UserResponse.")
 @Data
 public class UserResponse {
-    @Schema(name = "id", required = true, example = "979942b2-8697-48c8-b231-62f0722300ef", defaultValue = "", description = "Id del Usuario")
+    @Schema(name = "id", example = "979942b2-8697-48c8-b231-62f0722300ef", defaultValue = "", description = "Id del Usuario")
     private UUID id;
-    @Schema(name = "name", required = true, example = "Luis", defaultValue = "", description = "Nombre del Usuario")
+    @Schema(name = "name", example = "Luis", defaultValue = "", description = "Nombre del Usuario")
     private String name;
-    @Schema(name = "email", required = true, example = "luis@example.com", defaultValue = "luis@example.com", description = "Correo del Usuario.")
+    @Schema(name = "email", example = "luis@example.com", defaultValue = "luis@example.com", description = "Correo del Usuario.")
     private String email;
     private String password;
     private Date created;

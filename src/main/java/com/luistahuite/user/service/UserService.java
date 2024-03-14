@@ -29,10 +29,10 @@ public class UserService {
     private final PhoneService phoneService;
     private final RegexService regexService;
 
-    private static final String regexEmail = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-    private static final String regexPassword = "\\p{javaLowerCase}+";
-    private static final String regexTypeEmail = "email";
-    private static final String regexTypePassword = "password";
+    private static final String REGEXEMAIL = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+    private static final String REGEXPASSWORD = "\\p{javaLowerCase}+";
+    private static final String REGEXTYPEEMAIL = "email";
+    private static final String REGEXTYPEPASSWORD = "password";
 
 
     @Autowired
@@ -49,7 +49,7 @@ public class UserService {
 
 
     public User save(UserRequest userRequest) {
-        User user = userRequestMapper.UserRequestToUser(userRequest);
+        User user = userRequestMapper.userRequestToUser(userRequest);
         user.setToken(getJWTToken(userRequest.getEmail()));
         user = userRepository.save(user);
         for (PhoneRequest p : userRequest.getPhones()) {
@@ -88,8 +88,8 @@ public class UserService {
     }
 
     public Boolean validateRegexEmail(String email) {
-        String regex = regexEmail;
-        Optional<Regex> optionalRegex = regexService.findByType(regexTypeEmail);
+        String regex = REGEXEMAIL;
+        Optional<Regex> optionalRegex = regexService.findByType(REGEXTYPEEMAIL);
         if (optionalRegex.isPresent()) {
             regex = optionalRegex.get().getExpression();
         }
@@ -98,8 +98,8 @@ public class UserService {
     }
 
     public Boolean validateRegexPassword(String password) {
-        String regex = regexPassword;
-        Optional<Regex> optionalRegex = regexService.findByType(regexTypePassword);
+        String regex = REGEXPASSWORD;
+        Optional<Regex> optionalRegex = regexService.findByType(REGEXTYPEPASSWORD);
         if (optionalRegex.isPresent()) {
             regex = optionalRegex.get().getExpression();
         }

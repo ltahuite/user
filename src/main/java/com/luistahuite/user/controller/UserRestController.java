@@ -53,7 +53,7 @@ public class UserRestController {
         if (null == users || users.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.ok(userResponseMapper.UserListToUserResponseList(users));
+            return ResponseEntity.ok(userResponseMapper.userListToUserResponseList(users));
         }
     }
 
@@ -66,27 +66,27 @@ public class UserRestController {
         Optional<User> validateEmail = userService.findByEmail(userRequest.getEmail());
         if (validateEmail.isPresent()) {
             throw new RuleException("El correo ya registrado.", HttpStatus.PRECONDITION_FAILED);
-        } else if (!userService.validateRegexEmail(userRequest.getEmail())) {
+        } else if (Boolean.FALSE.equals(userService.validateRegexEmail(userRequest.getEmail()))) {
             throw new RuleException("El correo ingresado no cumple con el formato requerido.", HttpStatus.PRECONDITION_FAILED);
-        } else if (!userService.validateRegexPassword(userRequest.getPassword())) {
+        } else if (Boolean.FALSE.equals(userService.validateRegexPassword(userRequest.getPassword()))) {
             throw new RuleException("El password ingresado no cumple con el formato requerido.", HttpStatus.PRECONDITION_FAILED);
         } else {
             User save = userService.save(userRequest);
-            return new ResponseEntity<>(userResponseMapper.UserToUserResponse(save), HttpStatus.CREATED);
+            return new ResponseEntity<>(userResponseMapper.userToUserResponse(save), HttpStatus.CREATED);
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable UUID id, @RequestBody UserRequest userRequest) {
         Optional<User> optionalUser = userService.update(id, userRequest);
-        return optionalUser.map(user -> new ResponseEntity<>(userResponseMapper.UserToUserResponse(user), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return optionalUser.map(user -> new ResponseEntity<>(userResponseMapper.userToUserResponse(user), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @Operation(description = "Set Regular expression.", summary = "Type values: email, password.")
     @PostMapping("/setregex")
-    public ResponseEntity<?> setRegex(RegexRequest regexRequest) {
+    public ResponseEntity<?> setRegex(@RequestBody RegexRequest regexRequest) {
         Optional<Regex> optionalRegex = regexService.findByType(regexRequest.getType());
-        Regex regex = regexRequestMapper.RegexRequestToRegex(regexRequest);
+        Regex regex = regexRequestMapper.regexRequestToRegex(regexRequest);
         optionalRegex.ifPresent(value -> regex.setId(value.getId()));
 
         regexService.save(regex);

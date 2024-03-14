@@ -17,36 +17,12 @@ public class UserResponseMapper {
     }
 
 
-    public User UserResponseToUser(UserResponse userResponse) {
-        User user = new User();
-        user.setId(userResponse.getId());
-        user.setName(userResponse.getName());
-        user.setEmail(userResponse.getEmail());
-        user.setPassword(userResponse.getPassword());
-        return user;
-    }
-    List<User> UserResponseListToUserList(List<UserResponse> userResponses) {
-        List<User> users = new ArrayList<>();
-        userResponses.forEach(ur -> {
-            User user = new User();
-            user.setId(ur.getId());
-            user.setName(ur.getName());
-            user.setEmail(ur.getEmail());
-            user.setPassword(ur.getPassword());
-
-            users.add(user);
-        });
-
-        return users;
-    }
-    public UserResponse UserToUserResponse(User user) {
+    public UserResponse userToUserResponse(User user) {
         return mapUserToUserResponse(user);
     }
-    public List<UserResponse> UserListToUserResponseList(List<User> users) {
+    public List<UserResponse> userListToUserResponseList(List<User> users) {
         List<UserResponse> userResponses = new ArrayList<>();
-        users.forEach(user -> {
-            userResponses.add(mapUserToUserResponse(user));
-        });
+        users.forEach(user -> userResponses.add(mapUserToUserResponse(user)));
 
         return userResponses;
     }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RegexRequestMapper {
 
-    public Regex RegexRequestToRegex(RegexRequest regexRequest) {
+    public Regex regexRequestToRegex(RegexRequest regexRequest) {
         Regex regex = new Regex();
         regex.setType(regexRequest.getType());
         regex.setExpression(regexRequest.getExpression());

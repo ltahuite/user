@@ -1,9 +1,7 @@
 package com.luistahuite.user.service;
 
-import com.luistahuite.user.common.UserRequestMapper;
 import com.luistahuite.user.entities.Phone;
 import com.luistahuite.user.repository.PhoneRepository;
-import com.luistahuite.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
