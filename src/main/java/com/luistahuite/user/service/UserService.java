@@ -7,13 +7,18 @@ import com.luistahuite.user.entities.Phone;
 import com.luistahuite.user.entities.Regex;
 import com.luistahuite.user.entities.User;
 import com.luistahuite.user.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -36,6 +41,7 @@ public class UserService {
         this.phoneService = phoneService;
         this.regexService = regexService;
     }
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -43,7 +49,7 @@ public class UserService {
 
     public User save(UserRequest userRequest) {
         User user = userRequestMapper.UserRequestToUser(userRequest);
-
+        user.setToken(getJWTToken(userRequest.getEmail()));
         user = userRepository.save(user);
         for (PhoneRequest p : userRequest.getPhones()) {
             Phone phone = new Phone();
@@ -95,4 +101,20 @@ public class UserService {
         return Pattern.matches(regex, password);
     }
 
+    private String getJWTToken(String username) {
+        String secretKey = "mySecretKey";
+        List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+                .commaSeparatedStringToAuthorityList("ROLE_USER");
+
+        return Jwts
+                .builder()
+                .setId("LRT")
+                .setSubject(username)
+                .claim("authorities",
+                        grantedAuthorities.stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList()))
+                .signWith(SignatureAlgorithm.HS512,
+                        secretKey.getBytes()).compact();
+    }
 }

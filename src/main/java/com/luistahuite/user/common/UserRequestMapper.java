@@ -1,7 +1,6 @@
 package com.luistahuite.user.common;
 
 import com.luistahuite.user.dto.UserRequest;
-import com.luistahuite.user.entities.Phone;
 import com.luistahuite.user.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,8 +19,8 @@ public class UserRequestMapper {
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
         user.setPassword(userRequest.getPassword());
-//        List<Phone> phones = phoneRequestMapper.PhoneListRequestToPhoneList(userRequest.getPhones());
-//        user.setPhones(phones);
+        user.setIsActive(Boolean.TRUE);
+
         return user;
     }
     public List<User> UserRequestListToUserList(List<UserRequest> userRequest) {
@@ -31,6 +30,7 @@ public class UserRequestMapper {
             user.setName(ur.getName());
             user.setEmail(ur.getEmail());
             user.setPassword(ur.getPassword());
+            user.setIsActive(Boolean.TRUE);
 
             users.add(user);
         });

@@ -36,7 +36,6 @@ public class UserRestController {
     private final UserService userService;
     private final UserResponseMapper userResponseMapper;
     private final RegexService regexService;
-
     private final RegexRequestMapper regexRequestMapper;
 
 
